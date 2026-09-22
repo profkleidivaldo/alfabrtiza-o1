@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>TCE Educação Rondônia – Cadernos ALFABETIZAÇÂO</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --c1:#00B4D8;--c1d:#0077B6;--c2:#FF6B6B;--c2d:#CC2936;
+  --c3:#06D6A0;--c3d:#028A5C;--pc:#FFB703;--pcd:#FB8500;
+  --bg:#FFFBF0;--white:#fff;--text:#1a1a2e;--gray:#888;
+  --radius:20px;--shadow:0 8px 32px rgba(0,0,0,.12);
+  --font-head:'Fredoka One',cursive;--font-body:'Nunito',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100vh;background:var(--bg);font-family:var(--font-body);color:var(--text)}
+#root{min-height:100vh}
+
+/* ── ANIMATIONS ──────────────────────────────── */
+@keyframes pop{0%{transform:scale(.5);opacity:0}80%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes confetti-fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@keyframes slide-up{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* ── SCREENS ─────────────────────────────────── */
+.screen{display:none;min-height:100vh;padding:0}
+.screen.active{display:block;animation:slide-up .35s ease}
+
+/* ── HOME SCREEN ─────────────────────────────── */
+.home{background:linear-gradient(160deg,#0077B6 0%,#00B4D8 50%,#06D6A0 100%);min-height:100vh;padding:20px 16px 80px}
+.home-header{text-align:center;padding:30px 0 20px;color:#fff}
+.home-logo{font-family:var(--font-head);font-size:clamp(22px,5vw,36px);text-shadow:0 3px 10px rgba(0,0,0,.3);line-height:1.2}
+.home-sub{font-size:clamp(13px,3vw,18px);opacity:.9;margin-top:6px;font-weight:600}
+.stars-bar{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,.2);border-radius:50px;padding:10px 24px;margin:12px auto 28px;width:fit-content;font-size:clamp(16px,3vw,20px);color:#fff;font-weight:800;backdrop-filter:blur(10px)}
+
+.caderno-cards{display:flex;flex-direction:column;gap:18px;max-width:600px;margin:0 auto}
+.caderno-card{background:#fff;border-radius:24px;padding:22px 22px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s,box-shadow .15s;border:3px solid transparent;display:flex;align-items:center;gap:18px}
+.caderno-card:active{transform:scale(.97)}
+.caderno-card.c1{border-color:var(--c1)}
+.caderno-card.c2{border-color:var(--c2)}
+.caderno-card.pc{border-color:var(--pc)}
+.caderno-icon{font-size:52px;flex-shrink:0;line-height:1;filter:drop-shadow(0 3px 6px rgba(0,0,0,.15))}
+.caderno-info{flex:1}
+.caderno-badge{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;padding:3px 10px;border-radius:50px;display:inline-block;margin-bottom:6px}
+.c1 .caderno-badge{background:var(--c1);color:#fff}
+.c2 .caderno-badge{background:var(--c2);color:#fff}
+.pc .caderno-badge{background:var(--pc);color:#fff}
+.caderno-title{font-family:var(--font-head);font-size:clamp(18px,4vw,26px);line-height:1.2;margin-bottom:4px}
+.c1 .caderno-title{color:var(--c1d)}
+.c2 .caderno-title{color:var(--c2d)}
+.pc .caderno-title{color:var(--pcd)}
+.caderno-desc{font-size:clamp(11px,2.5vw,14px);color:var(--gray);font-weight:600;line-height:1.4}
+.caderno-progress{margin-top:8px;background:#f0f0f0;border-radius:50px;height:8px;overflow:hidden}
+.caderno-progress-fill{height:100%;border-radius:50px;transition:width .5s}
+.c1 .caderno-progress-fill{background:var(--c1)}
+.c2 .caderno-progress-fill{background:var(--c2)}
+.pc .caderno-progress-fill{background:var(--pc)}
+.caderno-chevron{font-size:24px;opacity:.5;flex-shrink:0}
+
+/* ── LESSON LIST SCREEN ──────────────────────── */
+.list-screen{min-height:100vh;background:var(--bg)}
+.list-header{padding:20px 16px 16px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.list-header.c1{background:linear-gradient(135deg,var(--c1d),var(--c1))}
+.list-header.c2{background:linear-gradient(135deg,var(--c2d),var(--c2))}
+.list-header.pc{background:linear-gradient(135deg,var(--pcd),var(--pc))}
+.btn-back{background:rgba(255,255,255,.25);border:none;color:#fff;font-size:22px;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.list-title{font-family:var(--font-head);font-size:clamp(18px,4vw,26px);color:#fff;flex:1;text-shadow:0 2px 4px rgba(0,0,0,.2)}
+.lesson-list{padding:16px;display:flex;flex-direction:column;gap:12px;max-width:600px;margin:0 auto}
+.lesson-item{background:#fff;border-radius:18px;padding:18px 18px;box-shadow:0 4px 16px rgba(0,0,0,.07);cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;align-items:center;gap:14px;border:2px solid transparent}
+.lesson-item:active{transform:scale(.97)}
+.lesson-item.completed{border-color:#06D6A0}
+.lesson-item.c1:hover{border-color:var(--c1)}
+.lesson-item.c2:hover{border-color:var(--c2)}
+.lesson-item.pc:hover{border-color:var(--pc)}
+.lesson-num{font-family:var(--font-head);font-size:22px;min-width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.c1 .lesson-num{background:var(--c1)}
+.c2 .lesson-num{background:var(--c2)}
+.pc .lesson-num{background:var(--pc)}
+.lesson-item-info{flex:1}
+.lesson-item-title{font-family:var(--font-head);font-size:clamp(15px,3vw,20px);color:var(--text)}
+.lesson-item-sub{font-size:12px;color:var(--gray);font-weight:600;margin-top:2px}
+.lesson-check{font-size:22px}
+
+/* ── LESSON SCREEN ───────────────────────────── */
+.lesson-screen{min-height:100vh;background:var(--bg)}
+.lesson-header{padding:16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.lesson-header.c1{background:linear-gradient(135deg,var(--c1d),var(--c1))}
+.lesson-header.c2{background:linear-gradient(135deg,var(--c2d),var(--c2))}
+.lesson-header.pc{background:linear-gradient(135deg,var(--pcd),var(--pc))}
+.lesson-header-info{flex:1;color:#fff}
+.lesson-aula-label{font-size:11px;font-weight:700;opacity:.8;text-transform:uppercase;letter-spacing:1px}
+.lesson-header-title{font-family:var(--font-head);font-size:clamp(16px,3.5vw,24px);text-shadow:0 2px 4px rgba(0,0,0,.2)}
+.lesson-stars{background:rgba(255,255,255,.25);border-radius:50px;padding:4px 12px;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+.lesson-content{padding:16px;max-width:700px;margin:0 auto;display:flex;flex-direction:column;gap:18px;padding-bottom:80px}
+
+/* ── READING CARD ────────────────────────────── */
+.reading-card{background:#fff;border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);border-left:6px solid var(--c1)}
+.reading-card.c2{border-left-color:var(--c2)}
+.reading-card.pc{border-left-color:var(--pc)}
+.reading-badge{display:inline-flex;align-items:center;gap:6px;background:#e8f8ff;color:var(--c1d);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;padding:4px 12px;border-radius:50px;margin-bottom:12px}
+.reading-card.c2 .reading-badge{background:#fff0f0;color:var(--c2d)}
+.reading-card.pc .reading-badge{background:#fff8e1;color:var(--pcd)}
+.reading-title{font-family:var(--font-head);font-size:clamp(18px,4vw,26px);margin-bottom:4px;color:var(--text)}
+.reading-author{font-size:12px;color:var(--gray);font-weight:600;margin-bottom:16px}
+.reading-text{font-size:clamp(14px,3vw,18px);line-height:1.9;font-weight:700;letter-spacing:.3px;white-space:pre-line;color:var(--text)}
+.reading-text .hl{color:var(--c2);font-weight:900;font-size:1.1em}
+
+/* ── ACTIVITY CARD ───────────────────────────── */
+.activity-card{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.activity-num{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--gray);margin-bottom:10px}
+.activity-instruction{font-size:clamp(14px,3vw,17px);font-weight:700;color:var(--text);margin-bottom:16px;line-height:1.5}
+
+/* Multiple Choice */
+.mc-options{display:flex;flex-direction:column;gap:10px}
+.mc-btn{padding:14px 18px;border-radius:14px;border:2.5px solid #e0e0e0;background:#f8f8f8;font-family:var(--font-body);font-size:clamp(13px,2.8vw,16px);font-weight:700;cursor:pointer;text-align:left;transition:all .15s;color:var(--text);display:flex;align-items:center;gap:12px}
+.mc-btn:active{transform:scale(.97)}
+.mc-btn.selected{border-color:var(--c1);background:#e8f8ff}
+.mc-btn.correct{border-color:#06D6A0;background:#e6fff8;animation:pop .3s}
+.mc-btn.wrong{border-color:var(--c2);background:#fff0f0;animation:shake .4s}
+.mc-letter{width:30px;height:30px;border-radius:50%;background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0;transition:background .15s}
+.mc-btn.correct .mc-letter{background:#06D6A0;color:#fff}
+.mc-btn.wrong .mc-letter{background:var(--c2);color:#fff}
+.mc-btn.selected .mc-letter{background:var(--c1);color:#fff}
+.feedback{margin-top:14px;padding:14px;border-radius:14px;font-size:clamp(14px,3vw,17px);font-weight:800;text-align:center;animation:pop .3s}
+.feedback.correct{background:#e6fff8;color:#028A5C;border:2px solid #06D6A0}
+.feedback.wrong{background:#fff0f0;color:var(--c2d);border:2px solid var(--c2)}
+
+/* Fill Blank */
+.fill-container{display:flex;flex-direction:column;gap:12px}
+.fill-item{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:clamp(14px,3vw,18px);font-weight:700;line-height:1.8}
+.fill-input{border:none;border-bottom:3px solid var(--c1);background:transparent;font-family:var(--font-body);font-size:clamp(14px,3vw,18px);font-weight:900;color:var(--text);text-transform:uppercase;width:120px;text-align:center;outline:none;padding:4px 4px;transition:border-color .2s}
+.fill-input:focus{border-color:var(--c2)}
+.fill-input.correct{border-color:#06D6A0;color:#028A5C}
+.fill-input.wrong{border-color:var(--c2);animation:shake .4s}
+.fill-check-btn{padding:12px 22px;border-radius:12px;border:none;background:var(--c1);color:#fff;font-family:var(--font-body);font-size:15px;font-weight:800;cursor:pointer;transition:transform .15s}
+.fill-check-btn:active{transform:scale(.95)}
+
+/* Rhyme Match */
+.rhyme-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.rhyme-col{display:flex;flex-direction:column;gap:10px}
+.rhyme-word{padding:12px 10px;border-radius:14px;border:2.5px solid #e0e0e0;background:#f8f8f8;font-family:var(--font-head);font-size:clamp(14px,3vw,18px);cursor:pointer;text-align:center;transition:all .15s;user-select:none;color:var(--text)}
+.rhyme-word:active{transform:scale(.95)}
+.rhyme-word.selected{border-color:var(--pc);background:#fff8e1;transform:scale(1.04)}
+.rhyme-word.matched{border-color:#06D6A0;background:#e6fff8;cursor:default}
+.rhyme-word.wrong-pick{border-color:var(--c2);background:#fff0f0;animation:shake .3s}
+
+/* Syllable Counter */
+.syllable-words{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+.syllable-word-card{background:#f8f8f8;border-radius:16px;padding:16px 20px;border:2.5px solid #e0e0e0;text-align:center;cursor:pointer;transition:all .2s;min-width:110px}
+.syllable-word-card:active{transform:scale(.95)}
+.syllable-word-card.counting{border-color:var(--pc);background:#fff8e1}
+.syllable-word-card.done{border-color:#06D6A0;background:#e6fff8}
+.syl-word{font-family:var(--font-head);font-size:clamp(15px,3vw,20px);color:var(--text);margin-bottom:8px}
+.syl-dots{display:flex;gap:5px;justify-content:center}
+.syl-dot{width:22px;height:22px;border-radius:50%;background:#ddd;transition:background .2s}
+.syl-dot.active{background:var(--pc)}
+.syl-count{font-size:22px;font-weight:900;color:var(--pcd);height:28px;display:flex;align-items:center;justify-content:center}
+.syl-tap-hint{font-size:11px;color:var(--gray);font-weight:600;margin-top:4px}
+
+/* Letter Find */
+.letter-find-container{line-height:2.4;font-size:clamp(15px,3vw,20px);font-weight:700;word-spacing:8px}
+.lf-word{display:inline-flex;flex-wrap:wrap;gap:2px;margin:4px 8px 4px 0}
+.lf-char{display:inline-block;padding:2px 3px;cursor:pointer;border-radius:6px;transition:all .15s;min-width:18px;text-align:center}
+.lf-char.found{background:var(--c2);color:#fff;transform:scale(1.2);animation:pop .2s}
+.lf-char.space{cursor:default}
+.find-score{margin-top:12px;font-size:15px;font-weight:800;color:var(--c1d)}
+
+/* Sort Words */
+.sort-container{display:flex;flex-direction:column;gap:16px}
+.sort-words-pool{display:flex;flex-wrap:wrap;gap:10px;min-height:50px;padding:12px;background:#f0f0f0;border-radius:14px;border:2px dashed #ccc}
+.sort-categories{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sort-category{background:#f8f8f8;border-radius:14px;padding:14px;min-height:80px;border:2.5px solid #e0e0e0}
+.sort-cat-title{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;color:var(--gray)}
+.sort-items{display:flex;flex-wrap:wrap;gap:8px}
+.sort-chip{padding:8px 14px;border-radius:50px;font-weight:800;font-size:clamp(13px,2.5vw,15px);cursor:pointer;transition:all .15s;user-select:none}
+.sort-chip.pool{background:#fff;border:2px solid #ccc;color:var(--text)}
+.sort-chip.pool:active{transform:scale(.93)}
+.sort-chip.placed{color:#fff}
+
+/* Navigation buttons */
+.nav-btns{display:flex;gap:12px;justify-content:space-between;margin-top:8px}
+.nav-btn{flex:1;padding:14px;border-radius:16px;border:none;font-family:var(--font-body);font-size:15px;font-weight:800;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.nav-btn:active{transform:scale(.97)}
+.btn-prev{background:#f0f0f0;color:var(--gray)}
+.btn-next{background:var(--c1);color:#fff}
+.btn-next.c2{background:var(--c2)}
+.btn-next.pc{background:var(--pc);color:var(--text)}
+
+/* Confetti */
+.confetti-piece{position:fixed;width:10px;height:10px;top:-20px;border-radius:2px;pointer-events:none;animation:confetti-fall linear forwards}
+
+/* Floating bottom bar */
+.bottom-fab{position:fixed;bottom:20px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:100}
+.fab{width:54px;height:54px;border-radius:50%;border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.fab:active{transform:scale(.9)}
+.fab-home{background:var(--c1d)}
+.fab-next{background:#06D6A0}
+
+/* Responsive */
+@media(min-width:600px){
+  .caderno-cards{flex-direction:column}
+  .mc-options{flex-direction:column}
+  .rhyme-grid{gap:30px}
+  .lesson-content{padding:24px}
+}
+@media(min-width:900px){
+  .lesson-content{padding:32px}
+  .activity-card{padding:28px}
+  .reading-card{padding:30px}
+  .mc-btn{padding:16px 22px;font-size:17px}
+}
+.emoji-decoration{font-size:2em;display:block;text-align:center;margin-bottom:8px;animation:bounce 2s infinite}
+
+/* ── LOGIN SCREEN ────────────────────────────── */
+.login-screen{min-height:100vh;background:linear-gradient(160deg,#0077B6 0%,#00B4D8 50%,#06D6A0 100%);display:flex;align-items:center;justify-content:center;padding:24px}
+.login-card{background:#fff;border-radius:28px;padding:32px 28px;box-shadow:var(--shadow);max-width:420px;width:100%;text-align:center}
+.login-emoji{font-size:56px;margin-bottom:6px;animation:bounce 2s infinite}
+.login-title{font-family:var(--font-head);font-size:clamp(20px,5vw,28px);color:var(--c1d);margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--gray);font-weight:600;margin-bottom:22px}
+.login-field{text-align:left;margin-bottom:16px}
+.login-label{font-size:12px;font-weight:800;color:var(--text);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.5px}
+.login-input{width:100%;padding:14px 16px;border-radius:14px;border:2.5px solid #e0e0e0;font-family:var(--font-body);font-size:16px;font-weight:700;color:var(--text);outline:none;transition:border-color .2s}
+.login-input:focus{border-color:var(--c1)}
+.login-btn{width:100%;padding:15px;border-radius:16px;border:none;background:var(--c1);color:#fff;font-family:var(--font-body);font-size:16px;font-weight:800;cursor:pointer;margin-top:6px;transition:transform .15s}
+.login-btn:active{transform:scale(.97)}
+.login-btn:disabled{opacity:.5;cursor:not-allowed}
+.login-note{font-size:11px;color:var(--gray);font-weight:600;margin-top:14px;line-height:1.5}
+.student-badge{display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(255,255,255,.2);border-radius:50px;padding:8px 18px;margin:0 auto 14px;width:fit-content;font-size:13px;color:#fff;font-weight:700;backdrop-filter:blur(10px)}
+.student-badge button{background:rgba(255,255,255,.3);border:none;color:#fff;font-size:11px;font-weight:800;padding:4px 10px;border-radius:50px;cursor:pointer}
+.sync-indicator{position:fixed;top:10px;right:10px;font-size:11px;font-weight:800;padding:5px 12px;border-radius:50px;z-index:200;transition:opacity .3s;pointer-events:none}
+.sync-indicator.ok{background:#06D6A0;color:#fff}
+.sync-indicator.pending{background:#FFB703;color:#1a1a2e}
+.sync-indicator.off{background:#aaa;color:#fff}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA – All three cadernos
+// ═══════════════════════════════════════════════════════════
+const CADERNOS = [
+  { id:'c1', label:'LIVRO 1', name:'Caderno de Sala de Aula', sub:'Aulas 1–70 • Vogais e Consoantes', emoji:'📚', color:'c1', aulas:1 },
+  { id:'c2', label:'LIVRO 2', name:'Caderno de Atividades', sub:'Aulas 71–122 • Consoantes Especiais', emoji:'✏️', color:'c2', aulas:71 },
+  { id:'pc', label:'PARA CASA', name:'Caderno Para Casa', sub:'Atividades de Reforço em Casa', emoji:'🏠', color:'pc', aulas:1 }
+];
+
+const LESSONS = [
+// ─── CADERNO 1 ───────────────────────────────────────────
+{id:'c1_a01',caderno:'c1',aula:1,topic:'VOGAIS',emoji:'🔤',
+ reading:{title:'SEU TATÁ',author:'Parlenda Popular',color:'c1',
+  text:'— O SEU TATÁ TÁ?\n— NÃO, O SEU TATÁ NÃO TÁ.\nMAS A MULHER DO SEU TATÁ TÁ.\nE QUANDO A MULHER DO SEU TATÁ TÁ,\nÉ A MESMA COISA QUE O SEU TATÁ, TÁ?',hl:'A'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. Marque um X no título da parlenda:',
+   options:['SEU TETÉ','SEU TITI','SEU TATÁ'],correct:2,
+   feedbackOk:'🎉 Muito bem! O título é SEU TATÁ!',feedbackErr:'💪 Tente de novo! Olhe o título no texto.'},
+  {id:'q2',type:'fill',instruction:'2. Complete a frase:',
+   items:[{template:'O SEU TATÁ ____ TÁ.',answer:'NÃO',hint:'Olhe o texto — NÃO ou SIM?'}]},
+  {id:'q3',type:'letter_find',instruction:'3. Clique em todas as letras A no texto:',
+   text:'TATÁ TÁ CASA ÁGUA ANA',target:'A'}
+ ]
+},
+{id:'c1_a03',caderno:'c1',aula:3,topic:'VOGAIS – LETRA A',emoji:'🕷️',
+ reading:{title:'ARANHA',author:'César Obeid',color:'c1',
+  text:'A ARANHA FAZ A TEIA\nCOM PREGUIÇA DE CAÇAR\nFICA QUIETA ESPERANDO\nUM INSETO BOBEAR\nE CAIR NA SUA TEIA\nPARA A FOME SACIAR.',hl:'A'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. A aranha faz a _____ para caçar:',
+   options:['TOCA','TEIA','CASA'],correct:1,
+   feedbackOk:'⭐ Correto! A aranha faz a TEIA!',feedbackErr:'💪 Leia o poema de novo!'},
+  {id:'q2',type:'syl',instruction:'2. Conte as sílabas de cada palavra. Toque para contar!',
+   words:[{w:'ARANHA',n:3},{w:'TEIA',n:2},{w:'INSETO',n:3},{w:'FOME',n:2}]},
+  {id:'q3',type:'rhyme',instruction:'3. Ligue as palavras que rimam:',
+   left:['CAÇAR','QUIETA'],right:['SACIAR','TEIA'],pairs:[[0,0],[1,1]]}
+ ]
+},
+{id:'c1_a05',caderno:'c1',aula:5,topic:'VOGAIS – LETRA E',emoji:'🐘',
+ reading:{title:'ELEFANTE',author:'Elias José',color:'c1',
+  text:'ENTRAR COM UM ELEFANTE\n— MESMO ELEGANTE —\nNUM EDIFÍCIO,\nÉ FÁCIL OU DIFÍCIL?\nMAS EM ESBOÇO, UM ELEFANTE\n— MESMO ELEGANTE —\nCABE ATÉ NO BOLSO.',hl:'E'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. Entrar com um elefante num edifício é:',
+   options:['FÁCIL','DIFÍCIL','IMPOSSÍVEL'],correct:1,
+   feedbackOk:'🎉 Muito bem! É DIFÍCIL!',feedbackErr:'💪 Pense bem...'},
+  {id:'q2',type:'mc',instruction:'2. Um elefante em esboço (desenho) cabe no:',
+   options:['EDIFÍCIO','BOLSO','RIO'],correct:1,
+   feedbackOk:'⭐ Correto! No BOLSO!',feedbackErr:'💪 Leia o último verso!'},
+  {id:'q3',type:'letter_find',instruction:'3. Clique em todas as letras E:',
+   text:'ELEFANTE ELEGANTE EDIFÍCIO',target:'E'}
+ ]
+},
+{id:'c1_a07',caderno:'c1',aula:7,topic:'VOGAIS – LETRA I',emoji:'🍦',
+ reading:{title:'INÊS',author:'Poesia Folclórica',color:'c1',
+  text:'INÊS É PRINCESA,\nISO É, ISSO É.\nINÊS TEM UMA ILHA,\nITAHIM, ITAIM.\nINÊS É BONITA,\nITAIM, ITAIM.',hl:'I'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. Inês é chamada de:',
+   options:['RAINHA','PRINCESA','FADA'],correct:1,
+   feedbackOk:'👑 Correto! PRINCESA!',feedbackErr:'💪 Procure no texto!'},
+  {id:'q2',type:'syl',instruction:'2. Conte as sílabas:',
+   words:[{w:'INÊS',n:2},{w:'ILHA',n:2},{w:'BONITA',n:3},{w:'PRINCESA',n:3}]},
+  {id:'q3',type:'letter_find',instruction:'3. Clique nas letras I:',
+   text:'INÊS ILHA ITAIM',target:'I'}
+ ]
+},
+{id:'c1_a09',caderno:'c1',aula:9,topic:'VOGAIS – LETRA O',emoji:'🌊',
+ reading:{title:'ONDA',author:'Parlenda',color:'c1',
+  text:'O MAR DE OLINDA\nTEM OLA, TEM ONDA.\nO OLHO DO BOTO\nNO FUNDO SE ESCONDE.',hl:'O'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. O texto fala do mar de:',
+   options:['OLINDA','SALVADOR','FORTALEZA'],correct:0,
+   feedbackOk:'🌊 Correto! OLINDA!',feedbackErr:'💪 Leia a primeira linha!'},
+  {id:'q2',type:'fill',instruction:'2. Complete:',
+   items:[{template:'O MAR TEM OLA E ____.',answer:'ONDA',hint:'Começa com O...'}]},
+  {id:'q3',type:'syl',instruction:'3. Conte as sílabas:',
+   words:[{w:'ONDA',n:2},{w:'OLHO',n:2},{w:'BOTO',n:2},{w:'FUNDO',n:2}]}
+ ]
+},
+{id:'c1_a11',caderno:'c1',aula:11,topic:'VOGAIS – LETRA U',emoji:'🍇',
+ reading:{title:'UVA E URU',author:'Poema Popular',color:'c1',
+  text:'UVA É UMA FRUTA UMA.\nURU É UM PÁSSARO UNO.\nUNIA OS DOIS,\nUNIA OS DOIS,\nE UMA MÚSICA FORMOU.',hl:'U'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. Uva é uma:',
+   options:['VERDURA','FRUTA','FLOR'],correct:1,
+   feedbackOk:'🍇 Correto! FRUTA!',feedbackErr:'💪 Tente de novo!'},
+  {id:'q2',type:'letter_find',instruction:'2. Clique nas letras U:',
+   text:'UVA URU UNO UMA',target:'U'},
+  {id:'q3',type:'syl',instruction:'3. Conte as sílabas:',
+   words:[{w:'UVA',n:2},{w:'URU',n:2},{w:'MÚSICA',n:3},{w:'PÁSSARO',n:3}]}
+ ]
+},
+{id:'c1_a19',caderno:'c1',aula:19,topic:'LETRA T',emoji:'🐢',
+ reading:{title:'TATU E TAINHA',author:'Trava-língua',color:'c1',
+  text:'O TATU TIRA A TAINHA DO TONEL.\nA TAINHA TIRA O TATU DO TONEL.\nQUEM TIRA QUEM DO TONEL?\nO TATU OU A TAINHA?',hl:'T'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. Quem está no tonel?',
+   options:['O TATU E A TAINHA','APENAS O TATU','APENAS A TAINHA'],correct:0,
+   feedbackOk:'🎉 Correto! Os dois!',feedbackErr:'💪 Leia devagar!'},
+  {id:'q2',type:'syl',instruction:'2. Divida em sílabas:',
+   words:[{w:'TATU',n:2},{w:'TAINHA',n:3},{w:'TONEL',n:2},{w:'TIRAR',n:2}]},
+  {id:'q3',type:'letter_find',instruction:'3. Encontre todas as letras T:',
+   text:'TATU TAINHA TONEL',target:'T'}
+ ]
+},
+{id:'c1_a25',caderno:'c1',aula:25,topic:'LETRA B',emoji:'🦋',
+ reading:{title:'BORBOLETINHA',author:'Canção Popular',color:'c1',
+  text:'BORBOLETINHA\nTÁ NA COZINHA\nFAZENDO CHOCOLATE\nPARA A MADRINHA\n\nPOTI POTI\nPERNA DE PAU\nOLHO DE VIDRO\nE NARIZ DE PICA PAU!',hl:'B'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. A borboletinha está:',
+   options:['NO JARDIM','NA COZINHA','NA SALA'],correct:1,
+   feedbackOk:'🦋 Correto! NA COZINHA!',feedbackErr:'💪 Leia a segunda linha!'},
+  {id:'q2',type:'mc',instruction:'2. O chocolate é para:',
+   options:['A MADRINHA','O PADRINHO','A VOVÓ'],correct:0,
+   feedbackOk:'🍫 Muito bem! Para a MADRINHA!',feedbackErr:'💪 Leia o quarto verso!'},
+  {id:'q3',type:'syl',instruction:'3. Conte as sílabas:',
+   words:[{w:'BORBOLETA',n:4},{w:'CHOCOLATE',n:4},{w:'NARIZ',n:2},{w:'VIDRO',n:2}]}
+ ]
+},
+{id:'c1_a37',caderno:'c1',aula:37,topic:'LETRA P',emoji:'🦆',
+ reading:{title:'PATO PATETA',author:'Canção Popular',color:'c1',
+  text:'O PATO PATETA\nPISOU NO TAPETE\nO TAPETE ERA VELHO\nE O PATO SE METEU\nA PATETA QUE É!',hl:'P'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. O pato pisou em:',
+   options:['PEDRA','TAPETE','POÇA'],correct:1,
+   feedbackOk:'🦆 Correto! No TAPETE!',feedbackErr:'💪 Procure no texto!'},
+  {id:'q2',type:'rhyme',instruction:'2. Ligue as palavras que rimam:',
+   left:['PATO','BOCA'],right:['GATO','TOCA'],pairs:[[0,0],[1,1]]},
+  {id:'q3',type:'letter_find',instruction:'3. Clique nas letras P:',
+   text:'PATO PATETA PISOU PEDRA',target:'P'}
+ ]
+},
+{id:'c1_a43',caderno:'c1',aula:43,topic:'LETRA D',emoji:'🎲',
+ reading:{title:'DADO DADO',author:'Parlenda',color:'c1',
+  text:'DADO, DADO,\nDE QUANTAS FACES TEM?\nSEIS FACES TEM O DADO.\nDE UM ATÉ O SEIS.\nROLA, DADO, ROLA!\nQUEM GANHA? QUEM PERDE?\nO DADO SÓ DECIDE!',hl:'D'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. Quantas faces tem o dado?',
+   options:['QUATRO','CINCO','SEIS'],correct:2,
+   feedbackOk:'🎲 Correto! SEIS faces!',feedbackErr:'💪 Leia o texto com atenção!'},
+  {id:'q2',type:'syl',instruction:'2. Conte as sílabas:',
+   words:[{w:'DADO',n:2},{w:'FACES',n:2},{w:'DECIDE',n:3},{w:'ROLANDO',n:3}]},
+  {id:'q3',type:'fill',instruction:'3. Complete:',
+   items:[{template:'O DADO TEM ____ FACES.',answer:'SEIS',hint:'Um número de 1 a 6...'}]}
+ ]
+},
+{id:'c1_a53',caderno:'c1',aula:53,topic:'LETRA L',emoji:'🦁',
+ reading:{title:'LEÃO E LAGARTA',author:'Parlenda',color:'c1',
+  text:'O LEÃO LEVA A LAGARTA\nPELA LONGA LAJOTA.\nA LAGARTA LÁ NA LAMA\nNÃO QUER IR PARA LOTA.',hl:'L'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. Para onde o leão leva a lagarta?',
+   options:['PARA A LAMA','PELA LAJOTA','PARA A LAGOA'],correct:1,
+   feedbackOk:'🦁 Excelente! Pela LAJOTA!',feedbackErr:'💪 Leia o primeiro verso!'},
+  {id:'q2',type:'letter_find',instruction:'2. Encontre as letras L:',
+   text:'LEÃO LAGARTA LAMA LONGA',target:'L'},
+  {id:'q3',type:'syl',instruction:'3. Conte as sílabas:',
+   words:[{w:'LEÃO',n:2},{w:'LAGARTA',n:3},{w:'LAJOTA',n:3},{w:'LAMA',n:2}]}
+ ]
+},
+// ─── CADERNO 2 ───────────────────────────────────────────
+{id:'c2_a71',caderno:'c2',aula:71,topic:'LETRA J',emoji:'🐞',
+ reading:{title:'JOANINHA',author:'Wania Amarante',color:'c2',
+  text:'OI, JOANINHA,\nMAS QUE GRACINHA\nA SUA CAPINHA\nDE POAZINHO!\nÉ PRETO NO BRANCO\nÉ BRANCO NO PRETO,\nE TEM VERMELHINHO\nEM FUNDO MARINHO\nNO SEU CASAQUINHO.',hl:'J'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. A figura principal do poema é:',
+   options:['O JACARÉ','A JOANINHA','A FORMIGA'],correct:1,
+   feedbackOk:'🐞 Correto! A JOANINHA!',feedbackErr:'💪 Leia o título!'},
+  {id:'q2',type:'rhyme',instruction:'2. Ligue as palavras que rimam:',
+   left:['GRACINHA','VERMELHINHO'],right:['JOANINHA','MARINHO'],pairs:[[0,0],[1,1]]},
+  {id:'q3',type:'mc',instruction:'3. No poema, o sentimento sobre a joaninha é de:',
+   options:['TRISTEZA','TERNURA','MÁGOA'],correct:1,
+   feedbackOk:'❤️ Correto! TERNURA!',feedbackErr:'💪 O poeta gosta ou não gosta da joaninha?'}
+ ]
+},
+{id:'c2_a73',caderno:'c2',aula:73,topic:'LETRA S',emoji:'🐸',
+ reading:{title:'O SAPO',author:'Ferreira Gullar',color:'c2',
+  text:'AQUI ESTOU EU: O SAPO,\nBOM DE PULO E BOM DE PAPO.\nFALO MAIS QUE JOÃO DO PULO,\nPULO MAIS QUE JOÃO DO PAPO.\nPOR CAUTELA, FALO POUCO,\nPRA EVITAR DE FICAR ROUCO.\nMAS, NA VERDADE, COAXO.',hl:'S'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. O primeiro verso indica que ele:',
+   options:['VAI APRESENTAR ALGUÉM','VAI FALAR DE SI MESMO','VAI EXPLICAR ALGO'],correct:1,
+   feedbackOk:'🐸 Correto! Ele fala DE SI MESMO!',feedbackErr:'💪 "Aqui estou EU: o sapo..."'},
+  {id:'q2',type:'mc',instruction:'2. O sapo fala pouco para não:',
+   options:['CANSAR','FICAR ROUCO','ERRAR'],correct:1,
+   feedbackOk:'⭐ Excelente! Para não FICAR ROUCO!',feedbackErr:'💪 Leia "por cautela...'},
+  {id:'q3',type:'rhyme',instruction:'3. Ligue os pares que rimam:',
+   left:['SAPO','ROUCO'],right:['PAPO','POUCO'],pairs:[[0,0],[1,1]]}
+ ]
+},
+{id:'c2_a79',caderno:'c2',aula:79,topic:'LETRA Z',emoji:'🦓',
+ reading:{title:'ZEBRINHA',author:'Wania Amarante',color:'c2',
+  text:'COITADA DA ZEBRA!\nÉ TÃO POBREZINHA,\nSÓ TEM UMA ROUPA,\nA COITADINHA!\nDORME DE PIJAMA,\nPIJAMA DE LISTRINHA,\nE PASSA DIAS INTEIROS\nVESTIDA DE PIJAMINHA.',hl:'Z'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. No poema, o sentimento sobre a zebrinha é de:',
+   options:['IRRITAÇÃO','TERNURA','CÓLERA'],correct:1,
+   feedbackOk:'🦓 Correto! TERNURA!',feedbackErr:'💪 O poeta simpatiza com a zebra?'},
+  {id:'q2',type:'rhyme',instruction:'2. Ligue as palavras que rimam:',
+   left:['ZEBRINHA','PIJAMINHA'],right:['COITADINHA','LISTRINHA'],pairs:[[0,0],[1,1]]},
+  {id:'q3',type:'syl',instruction:'3. Conte as sílabas:',
+   words:[{w:'ZEBRA',n:2},{w:'ZEBRINHA',n:3},{w:'PIJAMA',n:3},{w:'LISTRA',n:2}]}
+ ]
+},
+{id:'c2_a81',caderno:'c2',aula:81,topic:'LETRA Z – FICHA',emoji:'📋',
+ reading:{title:'FICHA TÉCNICA DA ZEBRA',author:'TCE Educação',color:'c2',
+  text:'NOME: ZEBRAS\nTAMANHO: 2 A 2,6 M\nPESO: ATÉ 350 KG\nONDE VIVE: ÁFRICA – SAVANAS E PRADARIAS\nALIMENTAÇÃO: GRAMAS, ARBUSTOS, FOLHAS\nCURIOSIDADE: LISTRAS FUNCIONAM COMO IMPRESSÃO DIGITAL.',hl:'Z'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. As zebras são animais:',
+   options:['CARNÍVOROS','HERBÍVOROS','ONÍVOROS'],correct:1,
+   feedbackOk:'🌿 Correto! HERBÍVOROS (comem plantas)!',feedbackErr:'💪 Veja o campo ALIMENTAÇÃO!'},
+  {id:'q2',type:'mc',instruction:'2. As zebras vivem na:',
+   options:['ÁFRICA','EUROPA','ÁSIA'],correct:0,
+   feedbackOk:'🌍 Correto! Na ÁFRICA!',feedbackErr:'💪 Leia o campo ONDE VIVE!'},
+  {id:'q3',type:'fill',instruction:'3. Complete:',
+   items:[{template:'As zebras pesam até ____ KG.',answer:'350',hint:'Olhe a ficha técnica...'}]}
+ ]
+},
+{id:'c2_a85',caderno:'c2',aula:85,topic:'LETRA C (CA, CO, CU)',emoji:'🐦',
+ reading:{title:'O CUCO',author:'Marina Colasanti',color:'c2',
+  text:'MAIS ESPERTO QUE MALUCO\nESTE É O RETRATO DO CUCO.\nTAÍ UM QUE NÃO SE MATA\nPRA FAZER UM PÉ-DE-MEIA\nE NEM PENSA EM BATER ASA\nPRA CONSTRUIR A CASA.\nOS SEUS OVOS, RAPIDINHO,\nPÕE NO NINHO DO VIZINHO.',hl:'C'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. Segundo o poema, o cuco é:',
+   options:['MALUCO','ESPERTO','AGITADO'],correct:1,
+   feedbackOk:'🐦 Correto! ESPERTO!',feedbackErr:'💪 Leia o primeiro verso!'},
+  {id:'q2',type:'mc',instruction:'2. O cuco coloca seus ovos:',
+   options:['NA CASA DELE','NO NINHO DO VIZINHO','EM QUALQUER LUGAR'],correct:1,
+   feedbackOk:'⭐ Correto! No NINHO DO VIZINHO!',feedbackErr:'💪 Leia o último verso!'},
+  {id:'q3',type:'rhyme',instruction:'3. Ligue as rimas:',
+   left:['MALUCO','RAPIDINHO'],right:['CUCO','VIZINHO'],pairs:[[0,0],[1,1]]}
+ ]
+},
+{id:'c2_a93',caderno:'c2',aula:93,topic:'LETRA G (GA, GO, GU)',emoji:'🐱',
+ reading:{title:'BORBA, O GATO',author:'Ruth Rocha',color:'c2',
+  text:'BORBA, O GATO, E DIOGO, O CÃO, ERAM MUITO AMIGOS.\nDESDO MUITO PEQUENOS FORAM CRIADOS NO MESMO QUINTAL.\nVOCÊS JÁ OUVIRAM QUE DUAS PESSOAS BRIGAM COMO CÃO E GATO?\nPOIS OS NOSSOS AMIGOS NUNCA BRIGAVAM!',hl:'G'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. O nome do gato da história é:',
+   options:['DIOGO','BORBA','RUTH'],correct:1,
+   feedbackOk:'🐱 Correto! BORBA!',feedbackErr:'💪 Leia o primeiro trecho!'},
+  {id:'q2',type:'mc',instruction:'2. Borba e Diogo foram criados:',
+   options:['EM BAIRROS DIFERENTES','NO MESMO QUINTAL','EM CIDADES DIFERENTES'],correct:1,
+   feedbackOk:'🏡 Correto! No MESMO QUINTAL!',feedbackErr:'💪 Releia o texto!'},
+  {id:'q3',type:'syl',instruction:'3. Conte as sílabas:',
+   words:[{w:'GATO',n:2},{w:'QUINTAL',n:2},{w:'AMIGOS',n:3},{w:'BORBA',n:2}]}
+ ]
+},
+{id:'c2_a101',caderno:'c2',aula:101,topic:'LETRA R',emoji:'🐁',
+ reading:{title:'R DE RECEITA',author:'Elza Beatriz',color:'c2',
+  text:'O RATO\nFEZ MACARRÃO\nCOM O CORDÃO\nDO SEU SAPATO,\nVEIO O SAPO\nE PULOU CORDA\nCOM O MACARRÃO DO RATO.\nMINHOCA FEZ NHOQUE\nCOM A CORDA DO SEU SAPO.',hl:'R'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. O rato fez macarrão com:',
+   options:['FARINHA DE TRIGO','O CORDÃO DO SAPATO','OVO E FARINHA'],correct:1,
+   feedbackOk:'🐁 Correto! Com o CORDÃO DO SAPATO!',feedbackErr:'💪 Leia os versos 2 e 3!'},
+  {id:'q2',type:'rhyme',instruction:'2. Ligue as rimas:',
+   left:['RATO','MINHOCA'],right:['SAPATO','NHOQUE'],pairs:[[0,0],[1,1]]},
+  {id:'q3',type:'mc',instruction:'3. Esta é uma receita do mundo:',
+   options:['REAL','DA POESIA','DO FUTURO'],correct:1,
+   feedbackOk:'🎭 Correto! Da POESIA — é imaginária!',feedbackErr:'💪 Rato faz macarrão de verdade?'}
+ ]
+},
+{id:'c2_a105',caderno:'c2',aula:105,topic:'LETRA R – ARARA',emoji:'🦜',
+ reading:{title:'A ARARA CANTORA',author:'Sônia Junqueira',color:'c2',
+  text:'AURORA É UMA ARARA.\nAURORA VIVE CONTENTE.\nELA MORA NO MEIO DAS ÁRVORES.\nAURORA CANTAVA GROSSO: ARARA!\nAURORA CANTAVA FININHO: ARARA!\nAURORA CANTAVA ALTO: ARARA!\nA BICHARADA NÃO AGUENTAVA MAIS!\nAURORA FICOU ROUCA: ORRORRO!',hl:'R'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. A arara se chama:',
+   options:['AURELIA','AURORA','ARARA'],correct:1,
+   feedbackOk:'🦜 Correto! AURORA!',feedbackErr:'💪 Leia o primeiro verso!'},
+  {id:'q2',type:'mc',instruction:'2. Aurora ficou rouca porque:',
+   options:['CANTOU MUITO','BEBEU GELADO','FICOU DOENTE'],correct:0,
+   feedbackOk:'⭐ Correto! Cantou MUITO!',feedbackErr:'💪 Pense bem...'},
+  {id:'q3',type:'fill',instruction:'3. Complete:',
+   items:[{template:'Aurora ficou ____.',answer:'ROUCA',hint:'Quando você fala muito, a voz fica...'}]}
+ ]
+},
+{id:'c2_a109',caderno:'c2',aula:109,topic:'QUE, QUI, QUA, QUO',emoji:'🪁',
+ reading:{title:'BRINQUEDOS E BRINCADEIRAS INDÍGENAS',author:'TCE Educação',color:'c2',
+  text:'AS BRINCADEIRAS INDÍGENAS MAIS COMUNS ENVOLVEM:\n• SUBIR EM ÁRVORES\n• TOMAR BANHOS DE RIO\n• MIRAR COM ARCO E FLECHA\n• BRINCAR COM ARGILA\n\nBRINCADEIRAS QUE TAMBÉM SÃO URBANAS:\n• PETECA  • QUEIMADA\n• BOLINHA DE GUDE  • CABO DE GUERRA',hl:'Q'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. O texto tem a finalidade de:',
+   options:['DAR INFORMAÇÕES','ANUNCIAR PRODUTO','CONTAR HISTÓRIA'],correct:0,
+   feedbackOk:'📋 Correto! Dar INFORMAÇÕES!',feedbackErr:'💪 Que tipo de texto é esse?'},
+  {id:'q2',type:'mc',instruction:'2. A peteca é uma brincadeira:',
+   options:['APENAS INDÍGENA','SOMENTE URBANA','INDÍGENA E URBANA'],correct:2,
+   feedbackOk:'🪁 Correto! INDÍGENA E URBANA!',feedbackErr:'💪 Leia a lista de brincadeiras!'},
+  {id:'q3',type:'syl',instruction:'3. Conte as sílabas:',
+   words:[{w:'PETECA',n:3},{w:'QUEIMADA',n:3},{w:'ARCO',n:2},{w:'ARGILA',n:3}]}
+ ]
+},
+{id:'c2_a114',caderno:'c2',aula:114,topic:'NH',emoji:'🐔',
+ reading:{title:'A GALINHA MEDROSA',author:'Lacocca',color:'c2',
+  text:'LOGO AO NASCER DO SOL, UMA GALINHA MEDROSA SAIU DO GALINHEIRO.\nELA VIU A PRÓPRIA SOMBRA ATRÁS DELA E LEVOU O MAIOR SUSTO:\n— SOCORRO! TEM UM BICHO HORROROSO ME PERSEGUINDO!\nE SAIU CORRENDO, TODA ARREPIADA.\nNO FINAL, DESCOBRIU QUE ERA SUA PRÓPRIA SOMBRA!',hl:'N'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. A galinha se assustou com:',
+   options:['UM BICHO REAL','SUA PRÓPRIA SOMBRA','UM BARULHO'],correct:1,
+   feedbackOk:'😂 Correto! Com a PRÓPRIA SOMBRA!',feedbackErr:'💪 Leia o final da história!'},
+  {id:'q2',type:'mc',instruction:'2. A galinha saiu do galinheiro:',
+   options:['À TARDE','À NOITE','AO NASCER DO SOL'],correct:2,
+   feedbackOk:'🌅 Correto! AO NASCER DO SOL!',feedbackErr:'💪 Leia a primeira linha!'},
+  {id:'q3',type:'rhyme',instruction:'3. Ligue as palavras que rimam:',
+   left:['GALINHA','GALINHEIRO'],right:['COBRINHA','GALINHADA'],pairs:[[0,0],[1,1]]}
+ ]
+},
+{id:'c2_a116',caderno:'c2',aula:116,topic:'CH',emoji:'☕',
+ reading:{title:'CHÁ MILAGROSO',author:'Elias José',color:'c2',
+  text:'DONA XUXA MEIO BRUXA,\nVIU SEU CHICO SE QUEIXAR,\nCOM MUITA DOR NO BUCHO\nFECHOU A PORTA DO CHALÉ,\nE FEZ CHÁ PARA O SEU CHICO,\nMUITO CHEIO DE XAVECO.',hl:'C'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. Dona Xuxa fez chá porque o Chico tinha:',
+   options:['DOR DE CABEÇA','DOR NO BUCHO','DOR NOS PÉS'],correct:1,
+   feedbackOk:'☕ Correto! DOR NO BUCHO (barriga)!',feedbackErr:'💪 Leia o terceiro verso!'},
+  {id:'q2',type:'mc',instruction:'2. Chalé quer dizer:',
+   options:['APARTAMENTO','PEQUENA CABANA/CASA','HOSPITAL'],correct:1,
+   feedbackOk:'🏠 Correto! Uma PEQUENA CABANA!',feedbackErr:'💪 Chalé é uma casa pequena!'},
+  {id:'q3',type:'letter_find',instruction:'3. Clique nas sílabas CH:',
+   text:'CHÁ CHICO CHALÉ CHEIO',target:'CH'}
+ ]
+},
+{id:'c2_a121',caderno:'c2',aula:121,topic:'LETRA H',emoji:'🦛',
+ reading:{title:'HIPOPÓTAMOS',author:'Brasil Escola',color:'c2',
+  text:'HIPOPÓTAMOS SÃO MAMÍFEROS.\nSÃO ANIMAIS COM CORPO EM FORMA DE BARRIL,\nCOM PERNAS CURTAS.\nPASSAM GRANDE PARTE DO DIA NA ÁGUA.\nOS HIPOPÓTAMOS VIVEM NA ÁFRICA.\nSUAS AMEAÇAS: CAÇA ILEGAL E PERDA DE HABITAT.',hl:'H'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. A finalidade do texto é:',
+   options:['CONTAR UMA HISTÓRIA','DAR INFORMAÇÕES','VENDER UM PRODUTO'],correct:1,
+   feedbackOk:'📚 Correto! Dar INFORMAÇÕES!',feedbackErr:'💪 Que tipo de texto é esse?'},
+  {id:'q2',type:'mc',instruction:'2. Os hipopótamos vivem na:',
+   options:['ÁFRICA','EUROPA','OCEANIA'],correct:0,
+   feedbackOk:'🌍 Correto! Na ÁFRICA!',feedbackErr:'💪 Leia o texto!'},
+  {id:'q3',type:'syl',instruction:'3. Conte as sílabas:',
+   words:[{w:'HIPOPÓTAMO',n:5},{w:'MAMÍFERO',n:4},{w:'BARRIL',n:2},{w:'HABITAT',n:3}]}
+ ]
+},
+// ─── PARA CASA ───────────────────────────────────────────
+{id:'pc_a01',caderno:'pc',aula:1,topic:'VOGAIS – TAREFA',emoji:'✏️',
+ reading:{title:'MINHA TAREFA',author:'Para Casa',color:'pc',
+  text:'AS VOGAIS SÃO:\n\nA  –  E  –  I  –  O  –  U\n\nTEMOS 5 VOGAIS NO ALFABETO.\nCOPIE E PINTE CADA VOGAL!',hl:'A'},
+ activities:[
+  {id:'q1',type:'fill',instruction:'1. Escreva as 5 vogais na ordem:',
+   items:[{template:'__ E __ O __',answer:'A I U',hint:'A _ E _ I _ O _ U'}]},
+  {id:'q2',type:'mc',instruction:'2. Quantas vogais temos?',
+   options:['4','5','6'],correct:1,
+   feedbackOk:'⭐ Correto! CINCO vogais!',feedbackErr:'💪 Conte: A E I O U'},
+  {id:'q3',type:'letter_find',instruction:'3. Toque em todas as vogais:',
+   text:'BOLA CASA FITA TUDO',target:'AEIOU'}
+ ]
+},
+{id:'pc_a03',caderno:'pc',aula:3,topic:'LETRA E – TAREFA',emoji:'🐘',
+ reading:{title:'TAREFA – LETRA E',author:'Para Casa',color:'pc',
+  text:'A LETRA E É UMA VOGAL.\nELA APARECE EM:\nELEFANTE  •  ESCOLA\nESTELA  •  ESPELHO\n\nEscute as palavras em voz alta!',hl:'E'},
+ activities:[
+  {id:'q1',type:'letter_find',instruction:'1. Toque nas letras E:',
+   text:'ELEFANTE ESCOLA ESTELA ESPELHO',target:'E'},
+  {id:'q2',type:'syl',instruction:'2. Divida em sílabas:',
+   words:[{w:'ESCOLA',n:3},{w:'ESTELA',n:3},{w:'ESPELHO',n:3}]},
+  {id:'q3',type:'fill',instruction:'3. Complete com E:',
+   items:[{template:'__LEFANTE VIU O __SPELHO.',answer:'E E',hint:'Duas letras E!'}]}
+ ]
+},
+{id:'pc_a25',caderno:'pc',aula:25,topic:'LETRA B – TAREFA',emoji:'🦋',
+ reading:{title:'TAREFA – LETRA B',author:'Para Casa',color:'pc',
+  text:'A LETRA B FAZ O SOM DE "BÊ".\n\nPALAVRAS COM B:\nBEIJO  •  BOLA  •  BARCO\nBONECA  •  BORBOLETA\n\nPrática com a família!',hl:'B'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. Qual dessas palavras começa com B?',
+   options:['CASA','BOLA','SALA'],correct:1,
+   feedbackOk:'🦋 Correto! BOLA começa com B!',feedbackErr:'💪 Fale em voz alta!'},
+  {id:'q2',type:'syl',instruction:'2. Conte as sílabas:',
+   words:[{w:'BOLA',n:2},{w:'BARCO',n:2},{w:'BONECA',n:3},{w:'BORBOLETA',n:4}]},
+  {id:'q3',type:'letter_find',instruction:'3. Encontre as letras B:',
+   text:'BEIJO BOLA BARCO BONECA',target:'B'}
+ ]
+},
+{id:'pc_a71',caderno:'pc',aula:71,topic:'LETRA J – TAREFA',emoji:'🐞',
+ reading:{title:'TAREFA – LETRA J',author:'Para Casa',color:'pc',
+  text:'A LETRA J FAZ O SOM DE "JÁ".\nEXEMPLOS:\nJARDIM  •  JANELA\nJUÍZO  •  JOGO\n\nTRAVA-LÍNGUA:\nO CAJU DO JUCA E A JACA DO CAJÁ,\nO JACÁ DA JUJU E O CAJU DO CACÁ.',hl:'J'},
+ activities:[
+  {id:'q1',type:'letter_find',instruction:'1. Toque em todos os J:',
+   text:'JARDIM JANELA JUÍZO JOGO',target:'J'},
+  {id:'q2',type:'syl',instruction:'2. Divida em sílabas:',
+   words:[{w:'JOGO',n:2},{w:'JARDIM',n:2},{w:'JANELA',n:3},{w:'JOANINHA',n:4}]},
+  {id:'q3',type:'fill',instruction:'3. Complete com JA, JE, JI, JO ou JU:',
+   items:[{template:'__ANELA, __OGOS, __ARDIN.',answer:'J J J',hint:'Todas começam com J!'}]}
+ ]
+},
+{id:'pc_a73',caderno:'pc',aula:73,topic:'LETRA S – TAREFA',emoji:'🐸',
+ reading:{title:'TAREFA – LETRA S',author:'Para Casa',color:'pc',
+  text:'TRAVA-LÍNGUA PARA PRATICAR:\n\nO SABIÁ NÃO SABIA\nQUE O SÁBIO SABIA\nQUE O SABIÁ\nNÃO SABIA ASSOBIAR.\n\nFale rápido com a família!',hl:'S'},
+ activities:[
+  {id:'q1',type:'mc',instruction:'1. O sabiá não sabia:',
+   options:['CANTAR','ASSOBIAR','VOAR'],correct:1,
+   feedbackOk:'🐦 Correto! Não sabia ASSOBIAR!',feedbackErr:'💪 Leia o final!'},
+  {id:'q2',type:'syl',instruction:'2. Conte as sílabas:',
+   words:[{w:'SABIÁ',n:3},{w:'SÁBIO',n:2},{w:'ASSOBIAR',n:4},{w:'SABIA',n:3}]},
+  {id:'q3',type:'letter_find',instruction:'3. Toque nas letras S:',
+   text:'SABIÁ SÁBIO SABIA',target:'S'}
+ ]
+},
+{id:'pc_a85',caderno:'pc',aula:85,topic:'CA, CO, CU – TAREFA',emoji:'🐦',
+ reading:{title:'TAREFA – CA, CO, CU',author:'Para Casa',color:'pc',
+  text:'CANÇÃO PARA PRATICAR:\n\nCORRE CUTIA\nNA CASA DA TIA\nCORRE CIPÓ\nNA CASA DA AVÓ.\n\nCante com a família!',hl:'C'},
+ activities:[
+  {id:'q1',type:'rhyme',instruction:'1. Ligue as rimas:',
+   left:['CUTIA','CIPÓ'],right:['TIA','AVÓ'],pairs:[[0,0],[1,1]]},
+  {id:'q2',type:'syl',instruction:'2. Conte as sílabas:',
+   words:[{w:'CUTIA',n:3},{w:'CIPÓ',n:2},{w:'CASA',n:2},{w:'CORRE',n:2}]},
+  {id:'q3',type:'fill',instruction:'3. Complete:',
+   items:[{template:'Corre ____ na casa da ____.',answer:'CUTIA TIA',hint:'Quem corre? Na casa de quem?'}]}
+ ]
+}
+];
+
+// ═══════════════════════════════════════════════════════════
+// CONFIG – Painel do Professor (Google Sheets via Apps Script)
+// ═══════════════════════════════════════════════════════════
+// 1) Siga as instruções enviadas pelo Claude para publicar o Code.gs
+//    como "Web app" no Google Apps Script.
+// 2) Cole aqui a URL que termina em /exec.
+const CONFIG = {
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyg-mW_EPxE4u05J3t_ezvMmZ2TSxuCXZZjA9mp3TfkMFA2OZo0OX_Ay7o2P18XMd0/exec', // ex: 'https://script.google.com/macros/s/AKfycb.../exec'
+};
+
+// ═══════════════════════════════════════════════════════════
+// STUDENT IDENTITY + SYNC
+// ═══════════════════════════════════════════════════════════
+const STUDENT_KEY = 'tce_student_v1';
+const QUEUE_KEY = 'tce_sync_queue_v1';
+
+function loadStudent() {
+  try {
+    const raw = localStorage.getItem(STUDENT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+function saveStudent(student) {
+  try { localStorage.setItem(STUDENT_KEY, JSON.stringify(student)); } catch(e) {}
+}
+function clearStudent() {
+  try { localStorage.removeItem(STUDENT_KEY); } catch(e) {}
+}
+function studentId() {
+  return state.student ? (state.student.nome + '|' + (state.student.turma||'')) : 'anon';
+}
+function progressKey() { return 'tce_progress_v1_' + studentId(); }
+function loadProgressLocal() {
+  try {
+    const raw = localStorage.getItem(progressKey());
+    return raw ? JSON.parse(raw) : {progress:{}, stars:0};
+  } catch(e) { return {progress:{}, stars:0}; }
+}
+function saveProgressLocal() {
+  try { localStorage.setItem(progressKey(), JSON.stringify({progress: state.progress, stars: state.stars})); } catch(e) {}
+}
+
+// Fila local de eventos ainda não confirmados (funciona offline)
+function loadQueue() {
+  try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveQueue(q) {
+  try { localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); } catch(e) {}
+}
+function setSyncIndicator(mode) {
+  let el = document.getElementById('sync-indicator');
+  if(!el) {
+    el = document.createElement('div');
+    el.id = 'sync-indicator';
+    el.className = 'sync-indicator';
+    document.body.appendChild(el);
+  }
+  const labels = {ok:'✅ Progresso salvo', pending:'⏳ Enviando...', off:'💾 Salvo no aparelho'};
+  el.className = 'sync-indicator ' + mode;
+  el.textContent = labels[mode] || '';
+  el.style.opacity = '1';
+  clearTimeout(window._syncTimer);
+  window._syncTimer = setTimeout(()=>{ el.style.opacity = '0'; }, 2200);
+}
+
+// Registra um evento (resposta, conclusão de aula, etc) e tenta enviar
+function logEvent(tipo, detalhe) {
+  const lesson = getCurrentLesson();
+  const record = {
+    timestamp: new Date().toISOString(),
+    nome: state.student ? state.student.nome : '',
+    turma: state.student ? state.student.turma : '',
+    tipo: tipo, // 'resposta' | 'aula_concluida'
+    caderno: lesson ? lesson.caderno : (state.caderno||''),
+    aula: lesson ? lesson.aula : '',
+    topico: lesson ? lesson.topic : '',
+    atividade: detalhe.atividade || '',
+    pergunta: detalhe.pergunta || '',
+    respostaAluno: detalhe.respostaAluno || '',
+    correto: detalhe.correto === undefined ? '' : (detalhe.correto ? 'SIM' : 'NAO'),
+    estrelas: detalhe.estrelas === undefined ? '' : detalhe.estrelas
+  };
+  const queue = loadQueue();
+  queue.push(record);
+  saveQueue(queue);
+  flushQueue();
+}
+
+// Tenta enviar todos os eventos pendentes para a planilha do professor
+function flushQueue() {
+  if(!CONFIG.APPS_SCRIPT_URL) { setSyncIndicator('off'); return; }
+  const queue = loadQueue();
+  if(queue.length === 0) return;
+  setSyncIndicator('pending');
+  // Envia em lote; usa no-cors pois o Apps Script Web App não retorna
+  // cabeçalhos CORS legíveis — não precisamos ler a resposta, só confirmar o envio.
+  fetch(CONFIG.APPS_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ records: queue })
+  }).then(() => {
+    saveQueue([]);
+    setSyncIndicator('ok');
+  }).catch(() => {
+    setSyncIndicator('off');
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let state = {
+  screen: 'home', // login | home | list | lesson
+  student: null, // {nome, turma}
+  caderno: null,
+  lessonIdx: 0,
+  activityIdx: 0,
+  stars: 0,
+  progress: {}, // lessonId -> {done, stars}
+  mc_answered: false,
+  mc_selected: null,
+  fill_answers: {},
+  fill_checked: false,
+  rhyme_selected: null,
+  rhyme_matched: [],
+  syl_state: {}, // wordIdx -> count
+  lf_found: new Set(),
+  lf_total: 0
+};
+
+function setState(updates) {
+  Object.assign(state, updates);
+  render();
+}
+
+// Touch sound feedback (visual only)
+function vibrate() { if(navigator.vibrate) navigator.vibrate(30); }
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function getLessons(cadernoId) {
+  return LESSONS.filter(l => l.caderno === cadernoId);
+}
+function getCurrentLesson() {
+  const list = getLessons(state.caderno);
+  return list[state.lessonIdx];
+}
+function getCurrentActivity() {
+  const l = getCurrentLesson();
+  if(!l) return null;
+  return l.activities[state.activityIdx];
+}
+function progress(lessonId) {
+  return state.progress[lessonId] || {done:false, stars:0};
+}
+function countStars(cadernoId) {
+  const list = getLessons(cadernoId);
+  return list.reduce((sum,l) => sum + (progress(l.id).stars||0), 0);
+}
+function maxStars(cadernoId) {
+  const list = getLessons(cadernoId);
+  return list.reduce((sum,l) => sum + l.activities.length, 0);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONFETTI
+// ═══════════════════════════════════════════════════════════
+function spawnConfetti(n=20) {
+  const colors=['#FFD700','#FF6B6B','#06D6A0','#00B4D8','#FFB703','#FF9EF1'];
+  const container = document.getElementById('root');
+  for(let i=0;i<n;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    el.style.cssText=`left:${Math.random()*100}vw;background:${colors[i%colors.length]};animation-duration:${1+Math.random()*1.5}s;animation-delay:${Math.random()*0.5}s;border-radius:${Math.random()>0.5?'50%':'3px'}`;
+    container.appendChild(el);
+    setTimeout(()=>el.remove(), 2500);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// ACTIVITY RESETS
+// ═══════════════════════════════════════════════════════════
+function resetActivity() {
+  setState({
+    mc_answered:false, mc_selected:null,
+    fill_answers:{}, fill_checked:false,
+    rhyme_selected:null, rhyme_matched:[],
+    syl_state:{}, lf_found:new Set(), lf_total:0
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function goHome() { setState({screen:'home', caderno:null}); }
+function goCaderno(id) { setState({screen:'list', caderno:id}); }
+function goLesson(idx) {
+  state.lessonIdx = idx;
+  state.activityIdx = 0;
+  resetActivity();
+  setState({screen:'lesson'});
+  setTimeout(() => window.scrollTo(0,0), 50);
+}
+function nextActivity() {
+  const lesson = getCurrentLesson();
+  if(state.activityIdx < lesson.activities.length - 1) {
+    state.activityIdx++;
+    resetActivity();
+    setState({});
+    setTimeout(() => window.scrollTo(0,0), 50);
+  } else {
+    // Lesson done
+    const stars = lesson.activities.length;
+    state.progress[lesson.id] = {done:true, stars};
+    state.stars += stars;
+    saveProgressLocal();
+    logEvent('aula_concluida', {atividade:'', estrelas: stars});
+    spawnConfetti(30);
+    setTimeout(()=>{
+      // Go to next lesson or back to list
+      const list = getLessons(state.caderno);
+      if(state.lessonIdx < list.length - 1) {
+        goLesson(state.lessonIdx + 1);
+      } else {
+        setState({screen:'list'});
+      }
+    }, 1500);
+  }
+}
+function prevActivity() {
+  if(state.activityIdx > 0) {
+    state.activityIdx--;
+    resetActivity();
+    setState({});
+  } else if(state.lessonIdx > 0) {
+    goLesson(state.lessonIdx - 1);
+  } else {
+    setState({screen:'list'});
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER HELPERS – Activities
+// ═══════════════════════════════════════════════════════════
+function renderMC(act, color) {
+  const letters = ['A','B','C','D'];
+  let html = '';
+  act.options.forEach((opt, i) => {
+    let cls = 'mc-btn';
+    if(state.mc_answered) {
+      cls += i === act.correct ? ' correct' : (i === state.mc_selected ? ' wrong' : '');
+    } else if(i === state.mc_selected) cls += ' selected';
+    html += `<button class="${cls}" onclick="handleMC(${i})">
+      <span class="mc-letter">${letters[i]}</span>
+      <span>${opt}</span>
+    </button>`;
+  });
+  let fb = '';
+  if(state.mc_answered) {
+    const ok = state.mc_selected === act.correct;
+    fb = `<div class="feedback ${ok?'correct':'wrong'}">${ok ? act.feedbackOk : act.feedbackErr}</div>`;
+    if(ok && !state._confettied) { spawnConfetti(15); state._confettied=true; }
+  }
+  return `<div class="mc-options">${html}</div>${fb}`;
+}
+
+function handleMC(i) {
+  if(state.mc_answered) return;
+  vibrate();
+  const act = getCurrentActivity();
+  state.mc_selected = i;
+  state.mc_answered = true;
+  state._confettied = false;
+  setState({});
+  logEvent('resposta', {
+    atividade:'multipla_escolha', pergunta: act.instruction,
+    respostaAluno: act.options[i], correto: i === act.correct
+  });
+  if(i === act.correct) {
+    setTimeout(nextActivity, 1400);
+  }
+}
+window.handleMC = handleMC;
+
+function renderFill(act, color) {
+  let html = '<div class="fill-container">';
+  act.items.forEach((item, idx) => {
+    const parts = item.template.split('____');
+    const val = state.fill_answers[idx] || '';
+    let inputCls = 'fill-input';
+    if(state.fill_checked) {
+      const correct = val.trim().toUpperCase() === item.answer.toUpperCase();
+      inputCls += correct ? ' correct' : ' wrong';
+    }
+    html += `<div class="fill-item">`;
+    parts.forEach((p, pi) => {
+      if(pi > 0) html += `<input class="${inputCls}" id="fill_${idx}_${pi}" value="${val}" oninput="handleFillInput(${idx},this.value)" placeholder="${item.hint||'...'}" maxlength="20">`;
+      html += `<span>${p}</span>`;
+    });
+    html += `</div>`;
+  });
+  html += `</div>`;
+  html += `<div style="margin-top:14px"><button class="fill-check-btn ${color}" onclick="checkFill()">✅ VERIFICAR</button></div>`;
+  if(state.fill_checked) {
+    const allOk = act.items.every((item,idx) => {
+      const v = state.fill_answers[idx]||'';
+      return v.trim().toUpperCase() === item.answer.toUpperCase();
+    });
+    html += `<div class="feedback ${allOk?'correct':'wrong'}">${allOk?'🎉 Correto! Muito bem!':'💪 Quase! Tente de novo!'}</div>`;
+    if(allOk) setTimeout(nextActivity, 1200);
+  }
+  return html;
+}
+function handleFillInput(idx, val) { state.fill_answers[idx]=val; state.fill_checked=false; setState({}); }
+function checkFill() {
+  state.fill_checked=true;
+  setState({});
+  const act = getCurrentActivity();
+  const allOk = act.items.every((item,idx) => {
+    const v = state.fill_answers[idx]||'';
+    return v.trim().toUpperCase() === item.answer.toUpperCase();
+  });
+  const respostas = act.items.map((_,idx)=> state.fill_answers[idx]||'').join(' | ');
+  logEvent('resposta', {
+    atividade:'completar', pergunta: act.instruction,
+    respostaAluno: respostas, correto: allOk
+  });
+}
+window.handleFillInput = handleFillInput;
+window.checkFill = checkFill;
+
+function renderRhyme(act, color) {
+  const { left, right, pairs } = act;
+  let html = '<div class="rhyme-grid"><div class="rhyme-col">';
+  left.forEach((w,i) => {
+    const isMatched = state.rhyme_matched.some(m=>m[0]===i);
+    const isSelected = state.rhyme_selected === i && !isMatched;
+    let cls = 'rhyme-word' + (isMatched?' matched':(isSelected?' selected':''));
+    html += `<div class="${cls}" onclick="selectRhymeLeft(${i})">${w}</div>`;
+  });
+  html += '</div><div class="rhyme-col">';
+  right.forEach((w,i) => {
+    const isMatched = state.rhyme_matched.some(m=>m[1]===i);
+    let cls = 'rhyme-word' + (isMatched?' matched':'');
+    html += `<div class="${cls}" onclick="selectRhymeRight(${i})">${w}</div>`;
+  });
+  html += '</div></div>';
+  if(state.rhyme_matched.length === pairs.length) {
+    html += `<div class="feedback correct">🎉 Parabéns! Todas as rimas encontradas!</div>`;
+    if(!state._rhyme_done) {
+      state._rhyme_done=true; spawnConfetti(20);
+      logEvent('resposta', {atividade:'rimas', pergunta:act.instruction, respostaAluno:'todas as rimas certas', correto:true});
+      setTimeout(nextActivity,1200);
+    }
+  }
+  return html;
+}
+function selectRhymeLeft(i) {
+  if(state.rhyme_matched.some(m=>m[0]===i)) return;
+  setState({rhyme_selected:i});
+}
+function selectRhymeRight(j) {
+  if(state.rhyme_selected===null) return;
+  if(state.rhyme_matched.some(m=>m[1]===j)) return;
+  const i = state.rhyme_selected;
+  const act = getCurrentActivity();
+  const isMatch = act.pairs.some(p=>p[0]===i && p[1]===j);
+  if(isMatch) {
+    state.rhyme_matched = [...state.rhyme_matched, [i,j]];
+    setState({rhyme_selected:null, _rhyme_done:false});
+  } else {
+    // wrong flash
+    setState({rhyme_selected:null});
+  }
+}
+window.selectRhymeLeft = selectRhymeLeft;
+window.selectRhymeRight = selectRhymeRight;
+
+function renderSyllable(act, color) {
+  let html = '<div class="syllable-words">';
+  act.words.forEach((item,wi) => {
+    const count = state.syl_state[wi]||0;
+    const done = count === item.n;
+    let cls = 'syllable-word-card' + (done?' done':(count>0?' counting':''));
+    html += `<div class="${cls}" onclick="tapSyllable(${wi}, ${item.n})">
+      <div class="syl-word">${item.w}</div>
+      <div class="syl-dots">${Array(item.n).fill('').map((_,di)=>`<div class="syl-dot${di<count?' active':''}"></div>`).join('')}</div>
+      <div class="syl-count">${count>0?count:''}</div>
+      <div class="syl-tap-hint">${done?'✅':'toque para contar'}</div>
+    </div>`;
+  });
+  html += '</div>';
+  const allDone = act.words.every((_,wi) => (state.syl_state[wi]||0) === act.words[wi].n);
+  if(allDone) {
+    html += `<div class="feedback correct">🎉 Excelente! Todas as sílabas corretas!</div>`;
+    if(!state._syl_done) {
+      state._syl_done=true; spawnConfetti(20);
+      logEvent('resposta', {atividade:'silabas', pergunta:act.instruction, respostaAluno:'todas as sílabas certas', correto:true});
+      setTimeout(nextActivity,1200);
+    }
+  }
+  return html;
+}
+function tapSyllable(wi, max) {
+  const cur = state.syl_state[wi]||0;
+  state.syl_state[wi] = cur >= max ? 0 : cur+1;
+  state._syl_done = false;
+  setState({});
+}
+window.tapSyllable = tapSyllable;
+
+function renderLetterFind(act, color) {
+  const target = act.target;
+  const words = act.text.split(' ');
+  const total = act.text.split('').filter(c=>target.includes(c.toUpperCase())).length;
+  if(state.lf_total !== total && total > 0) state.lf_total = total;
+  
+  let html = '<div class="letter-find-container">';
+  words.forEach((word, wi) => {
+    html += `<span class="lf-word">`;
+    word.split('').forEach((char, ci) => {
+      const key = `${wi}_${ci}`;
+      const isTarget = target.includes(char.toUpperCase());
+      const found = state.lf_found.has(key);
+      const cls = 'lf-char' + (isTarget?'':' space') + (found?' found':'');
+      html += `<span class="${cls}" ${isTarget?`onclick="findLetter('${key}')"`:''}>${char}</span>`;
+    });
+    html += `</span> `;
+  });
+  html += '</div>';
+  
+  const found = state.lf_found.size;
+  html += `<div class="find-score">Encontrados: ${found} / ${state.lf_total} ⭐</div>`;
+  
+  if(found >= state.lf_total && state.lf_total > 0) {
+    html += `<div class="feedback correct">🎉 Encontraste todos! Muito bem!</div>`;
+    if(!state._lf_done) {
+      state._lf_done=true; spawnConfetti(20);
+      logEvent('resposta', {atividade:'achar_letras', pergunta:act.instruction, respostaAluno:`encontrou ${found} letra(s) ${target}`, correto:true});
+      setTimeout(nextActivity,1200);
+    }
+  }
+  return html;
+}
+function findLetter(key) {
+  if(state.lf_found.has(key)) return;
+  state.lf_found = new Set([...state.lf_found, key]);
+  state._lf_done = false;
+  setState({});
+}
+window.findLetter = findLetter;
+
+// ═══════════════════════════════════════════════════════════
+// LOGIN SCREEN
+// ═══════════════════════════════════════════════════════════
+function renderLogin() {
+  return `<div class="screen login-screen active">
+    <div class="login-card">
+      <div class="login-emoji">👋</div>
+      <div class="login-title">Olá! Qual é o seu nome?</div>
+      <div class="login-sub">Assim seu professor pode acompanhar seu progresso.</div>
+      <div class="login-field">
+        <label class="login-label">Nome completo</label>
+        <input id="login-nome" class="login-input" placeholder="Ex: Maria Silva" maxlength="60" autocomplete="off">
+      </div>
+      <div class="login-field">
+        <label class="login-label">Turma (opcional)</label>
+        <input id="login-turma" class="login-input" placeholder="Ex: 1º Ano B" maxlength="40" autocomplete="off">
+      </div>
+      <button class="login-btn" onclick="submitLogin()">COMEÇAR A ESTUDAR ✏️</button>
+      <div class="login-note">Seu nome só é usado para o(a) professor(a) acompanhar suas atividades.</div>
+    </div>
+  </div>`;
+}
+function submitLogin() {
+  const nome = (document.getElementById('login-nome').value || '').trim();
+  const turma = (document.getElementById('login-turma').value || '').trim();
+  if(!nome) {
+    document.getElementById('login-nome').style.borderColor = 'var(--c2)';
+    return;
+  }
+  const student = {nome, turma};
+  saveStudent(student);
+  state.student = student;
+  const saved = loadProgressLocal();
+  state.progress = saved.progress || {};
+  state.stars = saved.stars || 0;
+  logEvent('login', {});
+  setState({screen:'home'});
+}
+function switchStudent() {
+  if(!confirm('Trocar de aluno? Seu progresso neste aparelho fica salvo para quando você voltar.')) return;
+  clearStudent();
+  state.student = null;
+  state.progress = {};
+  state.stars = 0;
+  setState({screen:'login'});
+}
+window.submitLogin = submitLogin;
+window.switchStudent = switchStudent;
+
+// ═══════════════════════════════════════════════════════════
+// MAIN RENDER
+// ═══════════════════════════════════════════════════════════
+function renderHome() {
+  const totalStars = Object.values(state.progress).reduce((s,p)=>s+(p.stars||0),0);
+  let cards = CADERNOS.map(c => {
+    const done = getLessons(c.id).filter(l=>progress(l.id).done).length;
+    const total = getLessons(c.id).length;
+    const pct = total>0 ? Math.round(done/total*100) : 0;
+    return `<div class="caderno-card ${c.color}" onclick="goCaderno('${c.id}')">
+      <div class="caderno-icon">${c.emoji}</div>
+      <div class="caderno-info">
+        <span class="caderno-badge">${c.label}</span>
+        <div class="caderno-title">${c.name}</div>
+        <div class="caderno-desc">${c.sub}</div>
+        <div class="caderno-progress"><div class="caderno-progress-fill" style="width:${pct}%"></div></div>
+        <div style="font-size:11px;color:var(--gray);font-weight:700;margin-top:4px">${done}/${total} aulas concluídas</div>
+      </div>
+      <div class="caderno-chevron">›</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="screen home active">
+    <div class="home-header">
+      <div style="font-size:56px;margin-bottom:8px;animation:bounce 2s infinite">📖</div>
+      <div class="home-logo">TCE EDUCAÇÃO<br>RONDÔNIA</div>
+      <div class="home-sub">ALFABETIZAÇÃO 1</div>
+    </div>
+    ${state.student ? `<div class="student-badge">👤 ${state.student.nome}${state.student.turma?' • '+state.student.turma:''} <button onclick="switchStudent()">trocar</button></div>` : ''}
+    <div class="stars-bar">⭐ ${totalStars} estrelas conquistadas!</div>
+    <div class="caderno-cards">${cards}</div>
+    <div style="text-align:center;margin-top:24px;font-size:12px;color:rgba(255,255,255,.6);font-weight:600">
+      Toque em um caderno para começar!
+    </div>
+  </div>`;
+}
+
+function renderList() {
+  const cad = CADERNOS.find(c=>c.id===state.caderno);
+  const lessons = getLessons(state.caderno);
+  let items = lessons.map((l,i) => {
+    const done = progress(l.id).done;
+    return `<div class="lesson-item ${cad.color} ${done?'completed':''}" onclick="goLesson(${i})">
+      <div class="lesson-num">${l.aula}</div>
+      <div class="lesson-item-info">
+        <div class="lesson-item-title">${l.emoji} ${l.topic}</div>
+        <div class="lesson-item-sub">${l.activities.length} atividades interativas</div>
+      </div>
+      <div class="lesson-check">${done?'✅':'▶️'}</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="screen list-screen active">
+    <div class="list-header ${cad.color}">
+      <button class="btn-back" onclick="goHome()">‹</button>
+      <div class="list-title">${cad.emoji} ${cad.name}</div>
+    </div>
+    <div class="lesson-list">${items}</div>
+  </div>`;
+}
+
+function renderLesson() {
+  const lesson = getCurrentLesson();
+  const act = getCurrentActivity();
+  const cad = CADERNOS.find(c=>c.id===state.caderno);
+  const color = lesson.caderno;
+  const list = getLessons(state.caderno);
+  const actNum = state.activityIdx + 1;
+  const actTotal = lesson.activities.length;
+
+  // Reading card
+  const r = lesson.reading;
+  let textHtml = r.text;
+  if(r.hl) {
+    const hl = r.hl;
+    textHtml = r.text.replace(new RegExp(`(${hl})`, 'g'), '<span class="hl">$1</span>');
+  }
+  const readingHtml = `<div class="reading-card ${color}">
+    <div class="reading-badge">📖 VAMOS LER</div>
+    <div class="reading-title">${r.title}</div>
+    <div class="reading-author">${r.author}</div>
+    <div class="reading-text">${textHtml}</div>
+  </div>`;
+
+  // Activity
+  let actHtml = '';
+  if(act) {
+    let inner = '';
+    if(act.type==='mc') inner = renderMC(act, color);
+    else if(act.type==='fill') inner = renderFill(act, color);
+    else if(act.type==='rhyme') inner = renderRhyme(act, color);
+    else if(act.type==='syl') inner = renderSyllable(act, color);
+    else if(act.type==='letter_find') inner = renderLetterFind(act, color);
+
+    actHtml = `<div class="activity-card">
+      <div class="activity-num">✏️ ATIVIDADE ${actNum} DE ${actTotal}</div>
+      <div class="activity-instruction">${act.instruction}</div>
+      ${inner}
+    </div>`;
+  }
+
+  // Progress dots
+  let dots = lesson.activities.map((_,i) => {
+    const bg = i < state.activityIdx ? '#06D6A0' : (i===state.activityIdx ? 'var(--'+color+')' : '#ddd');
+    return `<div style="width:10px;height:10px;border-radius:50%;background:${bg};transition:background .3s"></div>`;
+  }).join('');
+
+  const starsEarned = progress(lesson.id).stars || 0;
+
+  return `<div class="screen lesson-screen active">
+    <div class="lesson-header ${color}">
+      <button class="btn-back" onclick="setState({screen:'list'})">‹</button>
+      <div class="lesson-header-info">
+        <div class="lesson-aula-label">AULA ${lesson.aula} • ${cad.label}</div>
+        <div class="lesson-header-title">${lesson.emoji} ${lesson.topic}</div>
+      </div>
+      <div class="lesson-stars">⭐ ${starsEarned}</div>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:center;padding:12px 0 0">${dots}</div>
+    <div class="lesson-content">
+      ${readingHtml}
+      ${actHtml}
+      <div class="nav-btns">
+        <button class="nav-btn btn-prev" onclick="prevActivity()">‹ ANTERIOR</button>
+        <button class="nav-btn btn-next ${color}" onclick="nextActivity()">PRÓXIMA ›</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function render() {
+  const root = document.getElementById('root');
+  if(!root) return;
+  
+  if(state.screen === 'login') root.innerHTML = renderLogin();
+  else if(state.screen === 'home') root.innerHTML = renderHome();
+  else if(state.screen === 'list') root.innerHTML = renderList();
+  else if(state.screen === 'lesson') root.innerHTML = renderLesson();
+}
+
+// Expose global functions
+window.goCaderno = goCaderno;
+window.goHome = goHome;
+window.goLesson = goLesson;
+window.setState = setState;
+window.nextActivity = nextActivity;
+window.prevActivity = prevActivity;
+
+// Initial render
+document.addEventListener('DOMContentLoaded', () => {
+  const existing = loadStudent();
+  if(existing && existing.nome) {
+    state.student = existing;
+    const saved = loadProgressLocal();
+    state.progress = saved.progress || {};
+    state.stars = saved.stars || 0;
+    state.screen = 'home';
+  } else {
+    state.screen = 'login';
+  }
+  render();
+  flushQueue(); // tenta enviar eventos pendentes de sessões anteriores (offline)
+  // Keyboard support for whiteboard
+  document.addEventListener('keydown', e => {
+    if(state.screen === 'lesson') {
+      if(e.key === 'ArrowRight' || e.key === ' ') nextActivity();
+      if(e.key === 'ArrowLeft') prevActivity();
+      if(e.key === 'Escape') setState({screen:'list'});
+      if(['1','2','3'].includes(e.key)) {
+        const act = getCurrentActivity();
+        if(act && act.type==='mc') handleMC(parseInt(e.key)-1);
+      }
+    } else if(state.screen === 'list') {
+      if(e.key === 'Escape') goHome();
+    }
+  });
+});
+</script>
+</body>
+</html>
