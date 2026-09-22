@@ -956,7 +956,20 @@ function renderFill(act, color) {
   }
   return html;
 }
-function handleFillInput(idx, val) { state.fill_answers[idx]=val; state.fill_checked=false; setState({}); }
+function handleFillInput(idx, val) {
+  // Atualiza só o valor guardado, SEM re-renderizar a tela inteira —
+  // re-renderizar a cada tecla recria o campo de texto e "chuta" o
+  // cursor para fora dele, fazendo parecer que só digita 1 letra por vez.
+  state.fill_answers[idx] = val;
+  if(state.fill_checked) {
+    // se o aluno já tinha verificado e volta a editar, só limpa o
+    // destaque visual de certo/errado sem reconstruir o DOM
+    state.fill_checked = false;
+    document.querySelectorAll('.fill-input').forEach(inp => inp.classList.remove('correct','wrong'));
+    const fb = document.querySelector('.fill-container')?.parentElement?.querySelector('.feedback');
+    if(fb) fb.remove();
+  }
+}
 function checkFill() {
   state.fill_checked=true;
   setState({});
