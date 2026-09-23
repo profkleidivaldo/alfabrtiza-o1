@@ -569,7 +569,7 @@ const LESSONS = [
   text:'AS VOGAIS SÃO:\n\nA  –  E  –  I  –  O  –  U\n\nTEMOS 5 VOGAIS NO ALFABETO.\nCOPIE E PINTE CADA VOGAL!',hl:'A'},
  activities:[
   {id:'q1',type:'fill',instruction:'1. Escreva as 5 vogais na ordem:',
-   items:[{template:'__ E __ O __',answer:'A I U',hint:'A _ E _ I _ O _ U'}]},
+   items:[{template:'____ E ____ O ____',answer:'A I U',hint:'vogal'}]},
   {id:'q2',type:'mc',instruction:'2. Quantas vogais temos?',
    options:['4','5','6'],correct:1,
    feedbackOk:'⭐ Correto! CINCO vogais!',feedbackErr:'💪 Conte: A E I O U'},
@@ -586,7 +586,7 @@ const LESSONS = [
   {id:'q2',type:'syl',instruction:'2. Divida em sílabas:',
    words:[{w:'ESCOLA',n:3},{w:'ESTELA',n:3},{w:'ESPELHO',n:3}]},
   {id:'q3',type:'fill',instruction:'3. Complete com E:',
-   items:[{template:'__LEFANTE VIU O __SPELHO.',answer:'E E',hint:'Duas letras E!'}]}
+   items:[{template:'____LEFANTE VIU O ____SPELHO.',answer:'E E',hint:'Duas letras E!'}]}
  ]
 },
 {id:'pc_a25',caderno:'pc',aula:25,topic:'LETRA B – TAREFA',emoji:'🦋',
@@ -611,7 +611,7 @@ const LESSONS = [
   {id:'q2',type:'syl',instruction:'2. Divida em sílabas:',
    words:[{w:'JOGO',n:2},{w:'JARDIM',n:2},{w:'JANELA',n:3},{w:'JOANINHA',n:4}]},
   {id:'q3',type:'fill',instruction:'3. Complete com JA, JE, JI, JO ou JU:',
-   items:[{template:'__ANELA, __OGOS, __ARDIN.',answer:'J J J',hint:'Todas começam com J!'}]}
+   items:[{template:'____ANELA, ____OGOS, ____ARDIM.',answer:'J J J',hint:'Todas começam com J!'}]}
  ]
 },
 {id:'pc_a73',caderno:'pc',aula:73,topic:'LETRA S – TAREFA',emoji:'🐸',
@@ -931,15 +931,19 @@ function renderFill(act, color) {
   let html = '<div class="fill-container">';
   act.items.forEach((item, idx) => {
     const parts = item.template.split('____');
-    const val = state.fill_answers[idx] || '';
-    let inputCls = 'fill-input';
-    if(state.fill_checked) {
-      const correct = val.trim().toUpperCase() === item.answer.toUpperCase();
-      inputCls += correct ? ' correct' : ' wrong';
-    }
+    const expected = item.answer.trim().split(/\s+/); // 1 resposta esperada por lacuna
     html += `<div class="fill-item">`;
     parts.forEach((p, pi) => {
-      if(pi > 0) html += `<input class="${inputCls}" id="fill_${idx}_${pi}" value="${val}" oninput="handleFillInput(${idx},this.value)" placeholder="${item.hint||'...'}" maxlength="20">`;
+      if(pi > 0) {
+        const key = idx + '_' + (pi-1);
+        const val = state.fill_answers[key] || '';
+        let inputCls = 'fill-input';
+        if(state.fill_checked) {
+          const correct = val.trim().toUpperCase() === (expected[pi-1]||'').toUpperCase();
+          inputCls += correct ? ' correct' : ' wrong';
+        }
+        html += `<input class="${inputCls}" id="fill_${key}" value="${val}" oninput="handleFillInput('${key}',this.value)" placeholder="${item.hint||'...'}" maxlength="20">`;
+      }
       html += `<span>${p}</span>`;
     });
     html += `</div>`;
@@ -948,19 +952,19 @@ function renderFill(act, color) {
   html += `<div style="margin-top:14px"><button class="fill-check-btn ${color}" onclick="checkFill()">✅ VERIFICAR</button></div>`;
   if(state.fill_checked) {
     const allOk = act.items.every((item,idx) => {
-      const v = state.fill_answers[idx]||'';
-      return v.trim().toUpperCase() === item.answer.toUpperCase();
+      const expected = item.answer.trim().split(/\s+/);
+      return expected.every((exp,bi) => (state.fill_answers[idx+'_'+bi]||'').trim().toUpperCase() === exp.toUpperCase());
     });
     html += `<div class="feedback ${allOk?'correct':'wrong'}">${allOk?'🎉 Correto! Muito bem!':'💪 Quase! Tente de novo!'}</div>`;
     if(allOk) setTimeout(nextActivity, 1200);
   }
   return html;
 }
-function handleFillInput(idx, val) {
+function handleFillInput(key, val) {
   // Atualiza só o valor guardado, SEM re-renderizar a tela inteira —
   // re-renderizar a cada tecla recria o campo de texto e "chuta" o
   // cursor para fora dele, fazendo parecer que só digita 1 letra por vez.
-  state.fill_answers[idx] = val;
+  state.fill_answers[key] = val;
   if(state.fill_checked) {
     // se o aluno já tinha verificado e volta a editar, só limpa o
     // destaque visual de certo/errado sem reconstruir o DOM
@@ -975,10 +979,13 @@ function checkFill() {
   setState({});
   const act = getCurrentActivity();
   const allOk = act.items.every((item,idx) => {
-    const v = state.fill_answers[idx]||'';
-    return v.trim().toUpperCase() === item.answer.toUpperCase();
+    const expected = item.answer.trim().split(/\s+/);
+    return expected.every((exp,bi) => (state.fill_answers[idx+'_'+bi]||'').trim().toUpperCase() === exp.toUpperCase());
   });
-  const respostas = act.items.map((_,idx)=> state.fill_answers[idx]||'').join(' | ');
+  const respostas = act.items.map((item,idx) => {
+    const expected = item.answer.trim().split(/\s+/);
+    return expected.map((_,bi)=> state.fill_answers[idx+'_'+bi]||'').join(' ');
+  }).join(' | ');
   logEvent('resposta', {
     atividade:'completar', pergunta: act.instruction,
     respostaAluno: respostas, correto: allOk
